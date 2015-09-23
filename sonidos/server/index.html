@@ -1,0 +1,91 @@
+<html>
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="touch.js"></script>
+    <script>
+      var socket = io();
+      var array_mp3 = new Array(
+        "bassloop1.mp3",
+        "bassloop2.mp3",
+        "guitarloop1.mp3",
+        "guitarloop2.mp3"
+      );
+      $(document).ready(function(){
+        for(indice in array_mp3){
+          var mp3 = array_mp3[indice];
+          var id = mp3.replace(".","");
+          var template = '<button class="form-control btn-default play-mp3"><audio id="'+id+'" src="mp3/'+mp3+'"></audio>'+mp3+'</button> ';
+          $("#mp3-container").append(template);
+        }
+
+        /*$(".play-mp3").on('click',function(){
+          var _this = $(this),
+            _audio = _this.children("audio"),
+            _id = _audio.attr("id"),
+            _mp3 = document.getElementById(_id);
+            if(!_this.data("state")){
+              _this.data("state",true);
+              _mp3.loop=true;
+              _mp3.play();
+              _this.addClass("btn-success");
+            }else{
+              _this.data("state",false);
+              _mp3.pause();
+              _mp3.currentTime = 0;
+              _this.removeClass("btn-success");
+            }
+
+        });*/
+      })
+      /*$('form').submit(function(){
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });*/
+      socket.on('_play', function(id){
+        var _selector = "#"+id;
+        var _mp3 = document.getElementById(id);
+        _mp3.loop=true;
+        _mp3.play();
+        //console.log($(_selector))
+        $(_selector).parent("button").addClass("btn-success");
+
+      });
+      socket.on('_stop', function(id){
+        var _selector = "#"+id; 
+        var _mp3 = document.getElementById(id);
+        _mp3.pause();
+        _mp3.currentTime = 0; 
+        //console.log($(_selector))
+        $(_selector).parent("button").removeClass("btn-success");
+      });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+
+      <div>
+        <h1>1G Sound!</h1> 
+
+        <div id="mp3-container" class="form-group">
+          
+        </div> 
+
+      </div>
+
+      <div>
+        <canvas id="canvasSignature" width="500px" height="500px" style="border:2px solid #000000;">
+      </div>
+
+    </div><!-- /.container -->
+
+</body>
+</html>
+  
