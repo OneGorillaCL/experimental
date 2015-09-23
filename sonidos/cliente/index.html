@@ -1,0 +1,80 @@
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script src="socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+	socket = io.connect('http://socket.onegorilla.cl', {reconnect: true});
+	socket.on('connect', function () { 
+		console.log("socket connected"); 
+		$("#state").removeClass("alert-danger");
+		$("#state").html("ON");
+      var array_mp3 = new Array(
+        "bassloop1.mp3",
+        "bassloop2.mp3",
+        "guitarloop1.mp3",
+        "guitarloop2.mp3"
+      );
+      $(document).ready(function(){
+        for(indice in array_mp3){
+          var mp3 = array_mp3[indice];
+          var id = mp3.replace(".","");
+          var template = '<button data-state="false" class="form-control btn-default play-mp3" id="'+id+'">'+mp3+'</button> ';
+          $("#mp3-container").append(template);
+        }
+
+        $(".play-mp3").on('click',function(){
+          var _this = $(this),
+            _id = _this.attr("id");
+            if(!_this.data("state")){
+              _this.data("state",true);
+              _this.addClass("btn-success");
+			  socket.emit('play', _id);
+            }else{
+              _this.data("state",false);
+              _this.removeClass("btn-success");
+			  socket.emit('stop', _id);
+            }
+
+        });
+		
+		socket.on('_play', function(id){
+			var _selector = "#"+id;
+			$(_selector).data("state",true);
+			$(_selector).addClass("btn-success");
+		});
+		
+		socket.on('_stop', function(id){
+			var _selector = "#"+id;
+            $(_selector).data("state",false);
+            $(_selector).removeClass("btn-success");		
+		});
+		
+      });
+		
+	});
+    </script>
+</head>
+<body>
+
+    <div class="container">
+
+      <div>
+        <h1>1G Sound! [<span id="state" class="alert alert-danger">OFF</span>]</h1> 
+
+        <div id="mp3-container" class="form-group">
+          
+        </div> 
+
+      </div>
+
+    </div><!-- /.container -->
+
+</body>
+</html>
+  
